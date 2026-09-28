@@ -6,7 +6,7 @@ export interface FishingResult {
   exp: number;
 }
 
-export async function play(req: CurrentFishingSession): Promise<FishingResult> {
+export async function play(current: CurrentFishingSession): Promise<FishingResult> {
   return {
     loot: ["Widget", "Cookie"],
     exp: 123,
