@@ -1,6 +1,8 @@
 import {
   ChatInputCommandInteraction,
+  ContainerBuilder,
   type Guild,
+  MessageFlags,
   TextChannel,
   ThreadChannel,
 } from "discord.js";
@@ -11,6 +13,7 @@ import { FishingResult, play } from "../../lib/fish";
 
 const activeFishingSessions = new Map<string, FishingSession>();
 
+// TODO: store in DB in the future
 export interface FishingSession {
   fishingSessionKey: string;
   guildId: string;
@@ -23,6 +26,8 @@ export interface CurrentFishingSession {
   user: UserInfo;
 }
 
+const CONTAINER_COLOR_ACCENT = 5865242;
+
 export async function handleFishCommand(
   interaction: ChatInputCommandInteraction,
   log: Logger,
@@ -32,7 +37,7 @@ export async function handleFishCommand(
     return;
   }
 
-  // TODO: Implement ThreadChannel check
+  // TODO: implement ThreadChannel check
   const channel = await getTextChannelOrReply(interaction, "You can only create a fishing spot in a text channel or thread.");
   if (channel === null) {
     return;
@@ -40,8 +45,7 @@ export async function handleFishCommand(
 
   const fishingSessionKey = generateFishingSessionKey(interaction, guild);
 
-  // TODO: Implement rate limit: Discord API and server-side. Or maybe handle it in fish cmd
-  // instead of handler. Create Collection.
+  // TODO: implement rate limit: Discord API and server-side
   const current = await getCurrentFishingSession({
     interaction,
     guild,
@@ -79,11 +83,16 @@ async function getCurrentFishingSession(params:{
   fishingSessionKey: string;
   log: Logger;
 }): Promise<CurrentFishingSession> {
-  const { interaction } = params;
+  const { interaction, channel, guild } = params;
   const userId = interaction.user.id;
-
+  // TODO: Store member in cache only, not DB. Need to implement Cache object.
   const fishingSession = await getFishingSession(params)
-  const userInfo = await getUserInfo(userId);
+  const userInfo = await getUserInfo({
+    interaction,
+    channel,
+    guild,
+    userId,
+  });
 
   return {
     session: fishingSession,
