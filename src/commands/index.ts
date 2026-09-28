@@ -7,6 +7,7 @@ import type { Logger } from "pino";
 import bait from "./bait";
 import cat from "./cat";
 import cosmetic from "./cosmetic";
+import fish from "./fish";
 import fishingspot from "./fishingspot";
 import inventory from "./inventory";
 import ping from "./ping";
@@ -40,7 +41,7 @@ export interface Command {
 }
 
 // Add new commands here. Each entry is keyed by its slash command name at startup.
-const cmdList = [bait, cat, cosmetic, inventory, ping, rod, sell, user, fishingspot];
+const cmdList = [bait, cat, cosmetic, fish, fishingspot, inventory, ping, rod, sell, user];
 
 /**
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
