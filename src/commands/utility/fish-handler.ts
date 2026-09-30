@@ -54,6 +54,10 @@ export async function handleFishCommand(
     log,
   })
 
+  if (!current) {
+    return;
+  }
+
   const fishingResult = await play(current);
 
   if (!fishingResult) {
@@ -82,7 +86,7 @@ async function getCurrentFishingSession(params:{
   channel: TextChannel | ThreadChannel;
   fishingSessionKey: string;
   log: Logger;
-}): Promise<CurrentFishingSession> {
+}): Promise<CurrentFishingSession | null> {
   const { interaction, channel, guild } = params;
   const userId = interaction.user.id;
   // TODO: Store member in cache only, not DB. Need to implement Cache object.
@@ -93,6 +97,10 @@ async function getCurrentFishingSession(params:{
     guild,
     userId,
   });
+
+  if (!userInfo) {
+    return null;
+  }
 
   return {
     session: fishingSession,
@@ -109,21 +117,35 @@ async function getFishingSession(params: {
 }): Promise<FishingSession> {
   const { fishingSessionKey } = params;
 
-  const fishingSession = activeFishingSessions.get(fishingSessionKey)
-    ?? await createNewFishingSession(params);
+  const fishingSession = await fetchExistingFishingSession(fishingSessionKey)
+    ?? createNewFishingSession(params);
 
   rememberFishingSession(fishingSessionKey, fishingSession);
 
   return fishingSession;
 }
 
-async function createNewFishingSession(params: {
+async function fetchExistingFishingSession(
+  fishingSessionKey: string,
+): Promise<FishingSession | null> {
+  /* TODO: Extend this function to fetch asynchronously from an in-memory cache
+   * object in the future.
+   */
+  const fishingSession = activeFishingSessions.get(fishingSessionKey);
+  if (fishingSession === undefined) {
+    activeFishingSessions.delete(fishingSessionKey);
+    return null;
+  }
+  return fishingSession;
+}
+
+function createNewFishingSession(params: {
   interaction: ChatInputCommandInteraction;
   guild: Guild;
   channel: TextChannel | ThreadChannel;
   fishingSessionKey: string;
   log: Logger;
-}): Promise<FishingSession> {
+}): FishingSession {
   const { interaction, guild, channel, fishingSessionKey } = params;
   const fishingSession ={
     fishingSessionKey: fishingSessionKey,

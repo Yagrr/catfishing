@@ -32,7 +32,7 @@ export async function getUserInfo(params: {
   channel: TextChannel | ThreadChannel;
   guild: Guild;
   userId: string;
-}): Promise<UserInfo> {
+}): Promise<UserInfo | null> {
 // TODO: Fetch from cache or database, a global cache class must be created so other commands can
 // fetch from cache
   const { guild, userId } = params;
