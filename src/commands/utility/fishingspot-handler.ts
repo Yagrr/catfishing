@@ -11,8 +11,8 @@ import {
   ThreadAutoArchiveDuration,
   type ThreadChannel,
 } from "discord.js";
-import type { Logger } from "pino";
 import { getGuildOrReply, getTextChannelOrReply } from "./reply";
+import type { Logger } from "pino";
 
 interface FishingSpot {
   guildId: string;
@@ -468,13 +468,19 @@ export async function handleFishingSpotCommand(
   interaction: ChatInputCommandInteraction,
   log: Logger,
 ): Promise<void> {
-  const guild = await getGuildOrReply(interaction, "You can only use this command in a server.");
+  const guild = await getGuildOrReply(
+    interaction,
+    "You can only use this command in a server.",
+  );
 
   if (guild === null) {
     return;
   }
 
-  const channel = await getTextChannelOrReply(interaction, "You can only create a fishing spot in a text channel.");
+  const channel = await getTextChannelOrReply(
+    interaction,
+    "You can only create a fishing spot in a text channel.",
+  );
 
   if (channel === null) {
     return;

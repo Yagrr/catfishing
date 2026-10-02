@@ -1,25 +1,27 @@
-import { CurrentFishingSession } from "../commands/utility/fish-handler";
+import { type CurrentFishingSession } from "../commands/utility/fish-handler";
 
 export interface FishingResult {
+  exp: number;
+  location: string;
+  loot: Array<{ count: number; name: string }>;
   timestamp: number;
   userId: string;
-  location: string;
-  loot: Array<{ name: string, count: number }>;
-  exp: number;
 }
 
-export async function play(current: CurrentFishingSession): Promise<FishingResult> {
+export async function play(
+  current: CurrentFishingSession,
+): Promise<FishingResult> {
   ++current.session.fishCaught;
 
   // Hard coded example for now
   return {
-    timestamp: Date.now(),
-    userId: current.session.userId,
+    exp: 123,
     location: "localhost",
     loot: [
-      { name: "Widget", count: 4 },
-      { name: "Cookie", count: 2 },
+      { count: 2, name: "Cookie" },
+      { count: 4,  name: "Widget" },
     ],
-    exp: 123,
+    timestamp: Date.now(),
+    userId: current.session.userId
   };
 }

@@ -2,17 +2,17 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChatInputCommandInteraction,
+  type ChatInputCommandInteraction,
   ContainerBuilder,
   type Guild,
   MessageFlags,
-  TextChannel,
-  ThreadChannel,
+  type TextChannel,
+  type ThreadChannel,
 } from "discord.js";
-import { Logger } from "pino";
+import { type FishingResult, play } from "../../lib/fish";
 import { getGuildOrReply, getTextChannelOrReply } from "./reply";
-import { getUserInfo, UserInfo } from "./user";
-import { FishingResult, play } from "../../lib/fish";
+import { type UserInfo, getUserInfo} from "./user";
+import type { Logger } from "pino";
 
 const activeFishingSessions = new Map<string, FishingSession>();
 
@@ -38,7 +38,7 @@ const BUTTON_LABEL_SELL_FISH = "SELL";
 const BUTTON_LABEL_HOME = "RETURN";
 
 const BUTTON_ID_FISH = "fish";
-const BUTTON_ID_SELL_FISH = "sell"
+const BUTTON_ID_SELL_FISH = "sell";
 const BUTTON_ID_HOME = "home";
 
 // Backend calls and fish
@@ -46,13 +46,19 @@ export async function handleFishCommand(
   interaction: ChatInputCommandInteraction,
   log: Logger,
 ): Promise<void> {
-  const guild = await getGuildOrReply(interaction, "You can only use this command in a server.");
+  const guild = await getGuildOrReply(
+    interaction,
+    "You can only use this command in a server.",
+  );
   if (guild === null) {
     return;
   }
 
   // TODO: implement ThreadChannel check
-  const channel = await getTextChannelOrReply(interaction, "You can only create a fishing spot in a text channel or thread.");
+  const channel = await getTextChannelOrReply(
+    interaction,
+    "You can only create a fishing spot in a text channel or thread.",
+  );
   if (channel === null) {
     return;
   }
@@ -61,12 +67,12 @@ export async function handleFishCommand(
 
   // TODO: implement rate limit: Discord API and server-side
   const current = await getCurrentFishingSession({
-    interaction,
-    guild,
     channel,
     fishingSessionKey,
+    guild,
+    interaction,
     log,
-  })
+  });
 
   if (!current) {
     return;
@@ -79,11 +85,11 @@ export async function handleFishCommand(
   }
 
   await handleFishReply({
-    interaction,
-    current,
     channel,
+    current,
     fishingResult,
-    log
+    interaction,
+    log,
   });
 }
 
@@ -91,24 +97,24 @@ function generateFishingSessionKey(
   interaction: ChatInputCommandInteraction,
   guild: Guild,
 ): string {
-  return `${guild.id}:${interaction.user.id}`
+  return `${guild.id}:${interaction.user.id}`;
 }
 
-async function getCurrentFishingSession(params:{
-  interaction: ChatInputCommandInteraction;
-  guild: Guild;
+async function getCurrentFishingSession(params: {
   channel: TextChannel | ThreadChannel;
   fishingSessionKey: string;
+  guild: Guild;
+  interaction: ChatInputCommandInteraction;
   log: Logger;
 }): Promise<CurrentFishingSession | null> {
   const { interaction, channel, guild } = params;
   const userId = interaction.user.id;
   // TODO: Store member in cache only, not DB. Need to implement Cache object.
-  const fishingSession = await getFishingSession(params)
+  const fishingSession = await getFishingSession(params);
   const userInfo = await getUserInfo({
-    interaction,
     channel,
     guild,
+    interaction,
     userId,
   });
 
@@ -131,8 +137,9 @@ async function getFishingSession(params: {
 }): Promise<FishingSession> {
   const { fishingSessionKey } = params;
 
-  const fishingSession = await fetchExistingFishingSession(fishingSessionKey)
-    ?? createNewFishingSession(params);
+  const fishingSession =
+    (await fetchExistingFishingSession(fishingSessionKey)) ??
+    createNewFishingSession(params);
 
   rememberFishingSession(fishingSessionKey, fishingSession);
 
@@ -161,36 +168,40 @@ function createNewFishingSession(params: {
   log: Logger;
 }): FishingSession {
   const { interaction, guild, channel, fishingSessionKey } = params;
-  const fishingSession ={
-    fishingSessionKey: fishingSessionKey,
+  const fishingSession = {
+    channel,
+    fishCaught: 0,
+    fishingSessionKey,
     guildId: guild.id,
     userId: interaction.user.id,
-    channel: channel,
-    fishCaught: 0,
-  }
+  };
   return fishingSession;
 }
 
-function rememberFishingSession(fishingSessionKey: string, fishingSession: FishingSession): void {
+function rememberFishingSession(
+  fishingSessionKey: string,
+  fishingSession: FishingSession,
+): void {
   activeFishingSessions.set(fishingSessionKey, fishingSession);
 }
 
 // Reply logic
 async function handleFishReply(params: {
-  interaction: ChatInputCommandInteraction,
-  current: CurrentFishingSession,
-  channel: TextChannel | ThreadChannel,
-  fishingResult: FishingResult,
-  log: Logger,
+  channel: TextChannel | ThreadChannel;
+  current: CurrentFishingSession;
+  fishingResult: FishingResult;
+  interaction: ChatInputCommandInteraction;
+  log: Logger;
 }): Promise<void> {
   const { interaction, current, fishingResult } = params;
-  const fishDisplay = buildFishingDisplay(current, fishingResult)
+  const fishDisplay = buildFishingDisplay(current, fishingResult);
 
-  await interaction.reply({
-      flags: MessageFlags.IsComponentsV2,
+  await interaction
+    .reply({
       components: [fishDisplay],
-  })
-  .catch(() => null);
+      flags: MessageFlags.IsComponentsV2,
+    })
+    .catch(() => null);
 }
 
 // Frontend
@@ -198,16 +209,13 @@ function buildFishingDisplay(
   current: CurrentFishingSession,
   fishingResult: FishingResult,
 ): ContainerBuilder {
-
   const textFishingResult = parseFishingResultToString(current, fishingResult);
 
   const buttons = buildFishingDisplayButtons();
   const container = new ContainerBuilder()
     .setAccentColor(FISHING_CONTAINER_COLOR_ACCENT)
     .addTextDisplayComponents((textDisplay) =>
-      textDisplay.setContent(
-        `${current.user.displayName}`
-      ),
+      textDisplay.setContent(`${current.user.displayName}`),
     )
     .addTextDisplayComponents((textDisplay) =>
       textDisplay.setContent(textFishingResult),
@@ -217,32 +225,31 @@ function buildFishingDisplay(
   return container;
 }
 
-function parseFishingResultToString(current: CurrentFishingSession, fishingResult: FishingResult): string {
+function parseFishingResultToString(
+  current: CurrentFishingSession,
+  fishingResult: FishingResult,
+): string {
   return `### You caught:
-${
-fishingResult.loot
-.map((fish) => `${fish.count} ${fish.name}`)
-.join("\n")
-}
+${fishingResult.loot.map((fish) => `${fish.count} ${fish.name}`).join("\n")}
 +${fishingResult.exp} XP
-Total fish caught this sesson: ${current.session.fishCaught}`
+Total fish caught this sesson: ${current.session.fishCaught}`;
 }
 
 function buildFishingDisplayButtons(): ActionRowBuilder<ButtonBuilder> {
   const buttonFish = new ButtonBuilder()
     .setCustomId(BUTTON_ID_FISH)
-  .setLabel(BUTTON_LABEL_FISH)
-  .setStyle(ButtonStyle.Primary)
+    .setLabel(BUTTON_LABEL_FISH)
+    .setStyle(ButtonStyle.Primary);
 
   const buttonSell = new ButtonBuilder()
     .setCustomId(BUTTON_ID_SELL_FISH)
-  .setLabel(BUTTON_LABEL_SELL_FISH)
-  .setStyle(ButtonStyle.Primary)
+    .setLabel(BUTTON_LABEL_SELL_FISH)
+    .setStyle(ButtonStyle.Primary);
 
   const buttonHome = new ButtonBuilder()
     .setCustomId(BUTTON_ID_HOME)
-  .setLabel(BUTTON_LABEL_HOME)
-  .setStyle(ButtonStyle.Secondary)
+    .setLabel(BUTTON_LABEL_HOME)
+    .setStyle(ButtonStyle.Secondary);
 
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     buttonFish,

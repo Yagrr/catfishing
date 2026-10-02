@@ -1,5 +1,5 @@
 import {
-  ChatInputCommandInteraction,
+  type ChatInputCommandInteraction,
   type Guild,
   type TextChannel,
   type ThreadChannel,
@@ -8,11 +8,11 @@ import {
 import type { Command } from "../index";
 
 export interface UserInfo {
-  userId: string;
-  displayName: string;
-  level: number;
   biome: string; // TODO: to create biome type
   fishingRod: string; // TODO: to create fishing rod type
+  displayName: string;
+  level: number;
+  userId: string;
 }
 
 export default {
@@ -33,15 +33,15 @@ export async function getUserInfo(params: {
   guild: Guild;
   userId: string;
 }): Promise<UserInfo | null> {
-// TODO: Fetch from cache or database, a global cache class must be created so other commands can
-// fetch from cache
+  // TODO: Fetch from cache or database, a global cache class must be created so other commands can
+  // fetch from cache
   const { guild, userId } = params;
   const member = await guild.members.fetch(userId);
   return {
-    userId: userId,
-    displayName: member.displayName,
-    level: 1,
     biome: "localhost",
+    displayName: member.displayName,
     fishingRod: "Wooden Rod",
-  }
+    level: 1,
+    userId,
+  };
 }

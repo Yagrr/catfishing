@@ -6,7 +6,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("fish")
     .setDescription("Go Fishing!")
-  .toJSON(),
+    .toJSON(),
 
   async execute(interaction, ctx) {
     const log = ctx.logger.child({
@@ -18,5 +18,5 @@ export default {
     });
 
     await handleFishCommand(interaction, log);
-  }
+  },
 } satisfies Command;

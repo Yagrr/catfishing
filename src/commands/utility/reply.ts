@@ -1,6 +1,6 @@
 import {
-  type ChatInputCommandInteraction,
   ChannelType,
+  type ChatInputCommandInteraction,
   type Guild,
   type TextChannel,
 } from "discord.js";
@@ -13,8 +13,6 @@ import {
  * @returns The object or null if it doesn't exist in `interaction` parameter
  */
 
-
-
 export async function getGuildOrReply(
   interaction: ChatInputCommandInteraction,
   replyMessage: string,
@@ -26,7 +24,7 @@ export async function getGuildOrReply(
   }
 
   await interaction.editReply({
-    content: replyMessage
+    content: replyMessage,
   });
 
   return null;

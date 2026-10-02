@@ -41,7 +41,18 @@ export interface Command {
 }
 
 // Add new commands here. Each entry is keyed by its slash command name at startup.
-const cmdList = [bait, cat, cosmetic, fish, fishingspot, inventory, ping, rod, sell, user];
+const cmdList = [
+  bait,
+  cat,
+  cosmetic,
+  fish,
+  fishingspot,
+  inventory,
+  ping,
+  rod,
+  sell,
+  user,
+];
 
 /**
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
