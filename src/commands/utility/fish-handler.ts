@@ -1,4 +1,7 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   ChatInputCommandInteraction,
   ContainerBuilder,
   type Guild,
@@ -19,6 +22,7 @@ export interface FishingSession {
   guildId: string;
   userId: string;
   channel: TextChannel | ThreadChannel;
+  fishCaught: number;
 }
 
 export interface CurrentFishingSession {
@@ -26,8 +30,18 @@ export interface CurrentFishingSession {
   user: UserInfo;
 }
 
-const CONTAINER_COLOR_ACCENT = 5865242;
+// RGB
+const FISHING_CONTAINER_COLOR_ACCENT = 153_371_43;
 
+const BUTTON_LABEL_FISH = "FISH AGAIN!";
+const BUTTON_LABEL_SELL_FISH = "SELL";
+const BUTTON_LABEL_HOME = "RETURN";
+
+const BUTTON_ID_FISH = "fish";
+const BUTTON_ID_SELL_FISH = "sell"
+const BUTTON_ID_HOME = "home";
+
+// Backend calls and fish
 export async function handleFishCommand(
   interaction: ChatInputCommandInteraction,
   log: Logger,
@@ -152,6 +166,7 @@ function createNewFishingSession(params: {
     guildId: guild.id,
     userId: interaction.user.id,
     channel: channel,
+    fishCaught: 0,
   }
   return fishingSession;
 }
@@ -160,6 +175,7 @@ function rememberFishingSession(fishingSessionKey: string, fishingSession: Fishi
   activeFishingSessions.set(fishingSessionKey, fishingSession);
 }
 
+// Reply logic
 async function handleFishReply(params: {
   interaction: ChatInputCommandInteraction,
   current: CurrentFishingSession,
@@ -167,5 +183,70 @@ async function handleFishReply(params: {
   fishingResult: FishingResult,
   log: Logger,
 }): Promise<void> {
-  //
+  const { interaction, current, fishingResult } = params;
+  const fishDisplay = buildFishingDisplay(current, fishingResult)
+
+  await interaction.reply({
+      flags: MessageFlags.IsComponentsV2,
+      components: [fishDisplay],
+  })
+  .catch(() => null);
+}
+
+// Frontend
+function buildFishingDisplay(
+  current: CurrentFishingSession,
+  fishingResult: FishingResult,
+): ContainerBuilder {
+
+  const textFishingResult = parseFishingResultToString(current, fishingResult);
+
+  const buttons = buildFishingDisplayButtons();
+  const container = new ContainerBuilder()
+    .setAccentColor(FISHING_CONTAINER_COLOR_ACCENT)
+    .addTextDisplayComponents((textDisplay) =>
+      textDisplay.setContent(
+        `${current.user.displayName}`
+      ),
+    )
+    .addTextDisplayComponents((textDisplay) =>
+      textDisplay.setContent(textFishingResult),
+    )
+    .addActionRowComponents(buttons);
+
+  return container;
+}
+
+function parseFishingResultToString(current: CurrentFishingSession, fishingResult: FishingResult): string {
+  return `### You caught:
+${
+fishingResult.loot
+.map((fish) => `${fish.count} ${fish.name}`)
+.join("\n")
+}
++${fishingResult.exp} XP
+Total fish caught this sesson: ${current.session.fishCaught}`
+}
+
+function buildFishingDisplayButtons(): ActionRowBuilder<ButtonBuilder> {
+  const buttonFish = new ButtonBuilder()
+    .setCustomId(BUTTON_ID_FISH)
+  .setLabel(BUTTON_LABEL_FISH)
+  .setStyle(ButtonStyle.Primary)
+
+  const buttonSell = new ButtonBuilder()
+    .setCustomId(BUTTON_ID_SELL_FISH)
+  .setLabel(BUTTON_LABEL_SELL_FISH)
+  .setStyle(ButtonStyle.Primary)
+
+  const buttonHome = new ButtonBuilder()
+    .setCustomId(BUTTON_ID_HOME)
+  .setLabel(BUTTON_LABEL_HOME)
+  .setStyle(ButtonStyle.Secondary)
+
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    buttonFish,
+    buttonSell,
+    buttonHome,
+  );
 }
