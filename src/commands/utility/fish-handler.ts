@@ -7,7 +7,6 @@ import {
   type Guild,
   MessageFlags,
   type TextChannel,
-  type ThreadChannel,
 } from "discord.js";
 import { type FishingResult, play } from "../../lib/fish";
 import { getGuildOrReply, getTextChannelOrReply } from "./reply";
@@ -21,7 +20,7 @@ export interface FishingSession {
   fishingSessionKey: string;
   guildId: string;
   userId: string;
-  channel: TextChannel | ThreadChannel;
+  channel: TextChannel;
   fishCaught: number;
 }
 
@@ -57,7 +56,7 @@ export async function handleFishCommand(
   // TODO: implement ThreadChannel check
   const channel = await getTextChannelOrReply(
     interaction,
-    "You can only create a fishing spot in a text channel or thread.",
+    "You can only fish in a text channel."
   );
   if (channel === null) {
     return;
@@ -101,7 +100,7 @@ function generateFishingSessionKey(
 }
 
 async function getCurrentFishingSession(params: {
-  channel: TextChannel | ThreadChannel;
+  channel: TextChannel;
   fishingSessionKey: string;
   guild: Guild;
   interaction: ChatInputCommandInteraction;
@@ -131,7 +130,7 @@ async function getCurrentFishingSession(params: {
 async function getFishingSession(params: {
   interaction: ChatInputCommandInteraction;
   guild: Guild;
-  channel: TextChannel | ThreadChannel;
+  channel: TextChannel;
   fishingSessionKey: string;
   log: Logger;
 }): Promise<FishingSession> {
@@ -163,7 +162,7 @@ async function fetchExistingFishingSession(
 function createNewFishingSession(params: {
   interaction: ChatInputCommandInteraction;
   guild: Guild;
-  channel: TextChannel | ThreadChannel;
+  channel: TextChannel;
   fishingSessionKey: string;
   log: Logger;
 }): FishingSession {
@@ -187,7 +186,7 @@ function rememberFishingSession(
 
 // Reply logic
 async function handleFishReply(params: {
-  channel: TextChannel | ThreadChannel;
+  channel: TextChannel;
   current: CurrentFishingSession;
   fishingResult: FishingResult;
   interaction: ChatInputCommandInteraction;

@@ -36,7 +36,10 @@ export async function getTextChannelOrReply(
 ): Promise<TextChannel | null> {
   const { channel } = interaction;
 
-  if (channel?.type === ChannelType.GuildText) {
+  if (channel?.type === ChannelType.GuildText ||
+    channel?.type === ChannelType.PublicThread ||
+    channel?.type === ChannelType.PrivateThread
+  ) {
     return channel as TextChannel;
   }
 
