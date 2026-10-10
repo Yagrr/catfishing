@@ -14,6 +14,8 @@ import { getGuildOrReply, getTextChannelOrReply } from "./reply";
 import { type UserInfo, getUserInfo} from "./user";
 import type { Logger } from "pino";
 import { buildButtonFish } from "../fish";
+import { buildButtonSell } from "../sell";
+import { buildButtonInventory } from "../inventory";
 
 const activeFishingSessions = new Map<string, FishingSession>();
 
@@ -33,12 +35,6 @@ export interface CurrentFishingSession {
 
 // RGB
 const FISHING_CONTAINER_COLOR_ACCENT = 153_371_43;
-
-const BUTTON_LABEL_SELL_FISH = "SELL";
-const BUTTON_LABEL_HOME = "RETURN";
-
-const BUTTON_ID_SELL_FISH = "sell";
-const BUTTON_ID_HOME = "home";
 
 // Backend calls and fish
 export async function handleFishCommand(
@@ -235,21 +231,13 @@ Total fish caught this sesson: ${current.session.fishCaught}`;
 }
 
 function buildFishingDisplayButtons(): ActionRowBuilder<ButtonBuilder> {
-
-  const buttonSell = new ButtonBuilder()
-    .setCustomId(BUTTON_ID_SELL_FISH)
-    .setLabel(BUTTON_LABEL_SELL_FISH)
-    .setStyle(ButtonStyle.Primary);
-
-  const buttonHome = new ButtonBuilder()
-    .setCustomId(BUTTON_ID_HOME)
-    .setLabel(BUTTON_LABEL_HOME)
-    .setStyle(ButtonStyle.Secondary);
   const buttonFish = buildButtonFish();
+  const buttonSell = buildButtonSell();
+  const buttonInventory = buildButtonInventory();
 
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     buttonFish,
     buttonSell,
-    buttonHome,
+    buttonInventory,
   );
 }
