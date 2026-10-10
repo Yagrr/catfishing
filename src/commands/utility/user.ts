@@ -1,4 +1,5 @@
 import {
+    ButtonInteraction,
   type ChatInputCommandInteraction,
   type Guild,
   type TextChannel,
@@ -28,7 +29,7 @@ export default {
 } satisfies Command;
 
 export async function getUserInfo(params: {
-  interaction: ChatInputCommandInteraction;
+  interaction: ChatInputCommandInteraction | ButtonInteraction;
   channel: TextChannel | ThreadChannel;
   guild: Guild;
   userId: string;

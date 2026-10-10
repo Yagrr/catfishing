@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   type ChatInputCommandInteraction,
   ContainerBuilder,
@@ -42,7 +43,7 @@ const BUTTON_ID_HOME = "home";
 
 // Backend calls and fish
 export async function handleFishCommand(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
   log: Logger,
 ): Promise<void> {
   const guild = await getGuildOrReply(
@@ -93,7 +94,7 @@ export async function handleFishCommand(
 }
 
 function generateFishingSessionKey(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
   guild: Guild,
 ): string {
   return `${guild.id}:${interaction.user.id}`;
@@ -103,7 +104,7 @@ async function getCurrentFishingSession(params: {
   channel: TextChannel;
   fishingSessionKey: string;
   guild: Guild;
-  interaction: ChatInputCommandInteraction;
+  interaction: ChatInputCommandInteraction | ButtonInteraction;
   log: Logger;
 }): Promise<CurrentFishingSession | null> {
   const { interaction, channel, guild } = params;
@@ -128,7 +129,7 @@ async function getCurrentFishingSession(params: {
 }
 
 async function getFishingSession(params: {
-  interaction: ChatInputCommandInteraction;
+  interaction: ChatInputCommandInteraction | ButtonInteraction;
   guild: Guild;
   channel: TextChannel;
   fishingSessionKey: string;
@@ -160,7 +161,7 @@ async function fetchExistingFishingSession(
 }
 
 function createNewFishingSession(params: {
-  interaction: ChatInputCommandInteraction;
+  interaction: ChatInputCommandInteraction | ButtonInteraction;
   guild: Guild;
   channel: TextChannel;
   fishingSessionKey: string;
@@ -189,7 +190,7 @@ async function handleFishReply(params: {
   channel: TextChannel;
   current: CurrentFishingSession;
   fishingResult: FishingResult;
-  interaction: ChatInputCommandInteraction;
+  interaction: ChatInputCommandInteraction | ButtonInteraction;
   log: Logger;
 }): Promise<void> {
   const { interaction, current, fishingResult } = params;

@@ -1,4 +1,5 @@
 import {
+    ButtonInteraction,
   ChannelType,
   type ChatInputCommandInteraction,
   type Guild,
@@ -14,7 +15,7 @@ import {
  */
 
 export async function getGuildOrReply(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
   replyMessage: string,
 ): Promise<Guild | null> {
   const { guild } = interaction;
@@ -31,7 +32,7 @@ export async function getGuildOrReply(
 }
 
 export async function getTextChannelOrReply(
-  interaction: ChatInputCommandInteraction,
+  interaction: ChatInputCommandInteraction | ButtonInteraction,
   replyMessage: string,
 ): Promise<TextChannel | null> {
   const { channel } = interaction;
