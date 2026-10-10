@@ -9,7 +9,7 @@ import type { Logger } from "pino";
 import bait from "./bait";
 import cat from "./cat";
 import cosmetic from "./cosmetic";
-import fish from "./fish";
+import fish, { buttonfish } from "./fish";
 import fishingspot from "./fishingspot";
 import inventory from "./inventory";
 import ping from "./ping";
@@ -53,6 +53,15 @@ export interface Command extends InteractionModule<
 export interface Button extends InteractionModule<
   string, ButtonInteraction
   > {}
+
+/** LISTS OF NAMES TO BE REGISTERED
+ * Add new commands and buttons here.
+ * Commands: each entry is keyed by its slash command name at startup. Served
+ * globally via Discord API
+ * Buttons: client-side UI elements, identifiers work via button.customId.
+ * TODO: Handle buttons with prefixed customId instead of whole words
+ * (e.g., "inventory-next-page-1" vs. "inventory")
+ */
 const cmdList = [
   bait,
   cat,
@@ -66,10 +75,19 @@ const cmdList = [
   user,
 ];
 
-/**
+const btnList = [
+  buttonfish,
+]
+
+/** REGISTRIES
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.
  * Built once at module load. The `InteractionCreate` handler looks up commands from here.
  */
+
 export const commands = new Collection<string, Command>(
   cmdList.map((cmd) => [cmd.data.name, cmd]),
+);
+
+export const buttons = new Map<string, Button>(
+  btnList.map((btn) => [btn.data, btn]),
 );
