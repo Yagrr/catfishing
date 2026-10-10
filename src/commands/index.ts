@@ -1,4 +1,6 @@
 import {
+    BaseInteraction,
+  ButtonInteraction,
   type ChatInputCommandInteraction,
   Collection,
   type RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -25,22 +27,32 @@ export interface BotContext {
   logger: Logger;
 }
 
-/** The shape every command module must export. */
-export interface Command {
-  /** Slash command definition. Used for Discord API registration and interaction routing by name. */
-  data: RESTPostAPIChatInputApplicationCommandsJSONBody;
-
-  /**
-   * Called when a user invokes the command.
-   * Should throw on unrecoverable errors - the caller in index.ts catches and sends an error reply.
+/** Generic interactions interface for routing based on registry and executing commands*/
+interface InteractionModule<IdentifierType, I extends BaseInteraction> {
+  /** @param IdentifierType - generic identifier to route incoming interations, whether via Discord API (REST
+   * POST method .name field for slash commands) or client-side UI buttons (button ID)
+   *
+   * @param I - generic subclass of BaseInteraction, invoked when user interacts
+   * with the bot. Should throw on unrecoverable errors - the caller in index.ts catches and sends an error reply.
    */
+  data: IdentifierType
+
   execute: (
-    interaction: ChatInputCommandInteraction,
+    interation: I,
     ctx: BotContext,
   ) => Promise<void>;
 }
 
-// Add new commands here. Each entry is keyed by its slash command name at startup.
+/**
+ * Identified by
+*/
+export interface Command extends InteractionModule<
+  RESTPostAPIChatInputApplicationCommandsJSONBody,  ChatInputCommandInteraction
+  > {}
+
+export interface Button extends InteractionModule<
+  string, ButtonInteraction
+  > {}
 const cmdList = [
   bait,
   cat,
