@@ -21,7 +21,7 @@ export const buttonsell = {
   data: BUTTON_ID_SELL,
 
   async execute(interaction, ctx) {
-    const log = ctx.logger.child({
+    const _log = ctx.logger.child({
       channelId: interaction.channelId,
       command: "fish",
       guildId: interaction.guildId,
@@ -30,16 +30,13 @@ export const buttonsell = {
     });
 
     //TODO: Implement sell-handler
-  }
-} satisfies Button
+  },
+} satisfies Button;
 
 export function buildButtonSell(
   id: string = BUTTON_ID_SELL,
   label: string = BUTTON_LABEL_SELL,
   style: ButtonStyle = ButtonStyle.Primary,
 ): ButtonBuilder {
-  return new ButtonBuilder()
-    .setCustomId(id)
-    .setLabel(label)
-    .setStyle(style);
+  return new ButtonBuilder().setCustomId(id).setLabel(label).setStyle(style);
 }

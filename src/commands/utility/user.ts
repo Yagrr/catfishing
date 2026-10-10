@@ -1,5 +1,5 @@
+import type { ButtonInteraction } from "discord.js";
 import {
-    ButtonInteraction,
   type ChatInputCommandInteraction,
   type Guild,
   type TextChannel,
@@ -35,7 +35,7 @@ export async function getUserInfo(params: {
   userId: string;
 }): Promise<UserInfo | null> {
   // TODO: Fetch from cache or database, a global cache class must be created so other commands can
-  // fetch from cache
+  // Fetch from cache
   const { guild, userId } = params;
   const member = await guild.members.fetch(userId);
   return {

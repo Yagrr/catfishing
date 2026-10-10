@@ -3,7 +3,7 @@ import { type CurrentFishingSession } from "../commands/utility/fish-handler";
 export interface FishingResult {
   exp: number;
   location: string;
-  loot: Array<{ count: number; name: string }>;
+  loot: { count: number; name: string }[];
   timestamp: number;
   userId: string;
 }
@@ -19,9 +19,9 @@ export async function play(
     location: "localhost",
     loot: [
       { count: 2, name: "Cookie" },
-      { count: 4,  name: "Widget" },
+      { count: 4, name: "Widget" },
     ],
     timestamp: Date.now(),
-    userId: current.session.userId
+    userId: current.session.userId,
   };
 }

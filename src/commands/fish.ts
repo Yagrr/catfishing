@@ -37,16 +37,13 @@ export const buttonfish = {
     });
 
     await handleFishCommand(interaction, log);
-  }
-} satisfies Button
+  },
+} satisfies Button;
 
 export function buildButtonFish(
   id: string = BUTTON_ID_FISH,
   label: string = BUTTON_LABEL_FISH,
   style: ButtonStyle = ButtonStyle.Primary,
 ): ButtonBuilder {
-  return new ButtonBuilder()
-    .setCustomId(id)
-    .setLabel(label)
-    .setStyle(style);
+  return new ButtonBuilder().setCustomId(id).setLabel(label).setStyle(style);
 }

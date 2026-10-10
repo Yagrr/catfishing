@@ -21,7 +21,7 @@ export const buttonfish = {
   data: BUTTON_ID_INVENTORY,
 
   async execute(interaction, ctx) {
-    const log = ctx.logger.child({
+    const _log = ctx.logger.child({
       channelId: interaction.channelId,
       command: "fish",
       guildId: interaction.guildId,
@@ -30,18 +30,15 @@ export const buttonfish = {
     });
 
     // TODO: Implement inventory handler Inventory display component will show
-    // different buttons at the bottom. Need to implement flexible
+    // Different buttons at the bottom. Need to implement flexible
     // ActionRowBuilder depending on where `inventory` is triggered
-  }
-} satisfies Button
+  },
+} satisfies Button;
 
 export function buildButtonInventory(
   id: string = BUTTON_ID_INVENTORY,
   label: string = BUTTON_LABEL_INVENTORY,
   style: ButtonStyle = ButtonStyle.Primary,
 ): ButtonBuilder {
-  return new ButtonBuilder()
-    .setCustomId(id)
-    .setLabel(label)
-    .setStyle(style);
+  return new ButtonBuilder().setCustomId(id).setLabel(label).setStyle(style);
 }

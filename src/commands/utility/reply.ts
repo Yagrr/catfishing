@@ -1,5 +1,5 @@
+import type { ButtonInteraction } from "discord.js";
 import {
-    ButtonInteraction,
   ChannelType,
   type ChatInputCommandInteraction,
   type Guild,
@@ -37,7 +37,8 @@ export async function getTextChannelOrReply(
 ): Promise<TextChannel | null> {
   const { channel } = interaction;
 
-  if (channel?.type === ChannelType.GuildText ||
+  if (
+    channel?.type === ChannelType.GuildText ||
     channel?.type === ChannelType.PublicThread ||
     channel?.type === ChannelType.PrivateThread
   ) {

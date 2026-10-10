@@ -1,6 +1,5 @@
+import type { BaseInteraction, ButtonInteraction } from "discord.js";
 import {
-    BaseInteraction,
-  ButtonInteraction,
   type ChatInputCommandInteraction,
   Collection,
   type RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -35,24 +34,20 @@ interface InteractionModule<IdentifierType, I extends BaseInteraction> {
    * @param I - generic subclass of BaseInteraction, invoked when user interacts
    * with the bot. Should throw on unrecoverable errors - the caller in index.ts catches and sends an error reply.
    */
-  data: IdentifierType
+  data: IdentifierType;
 
-  execute: (
-    interation: I,
-    ctx: BotContext,
-  ) => Promise<void>;
+  execute: (interation: I, ctx: BotContext) => Promise<void>;
 }
 
 /**
  * Identified by
-*/
+ */
 export interface Command extends InteractionModule<
-  RESTPostAPIChatInputApplicationCommandsJSONBody,  ChatInputCommandInteraction
-  > {}
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+  ChatInputCommandInteraction
+> {}
 
-export interface Button extends InteractionModule<
-  string, ButtonInteraction
-  > {}
+export interface Button extends InteractionModule<string, ButtonInteraction> {}
 
 /** LISTS OF NAMES TO BE REGISTERED
  * Add new commands and buttons here.
@@ -75,9 +70,7 @@ const cmdList = [
   user,
 ];
 
-const btnList = [
-  buttonfish,
-]
+const btnList = [buttonfish];
 
 /** REGISTRIES
  * A `Collection` (Discord.js Map subclass) of all registered commands, keyed by name.

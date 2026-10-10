@@ -1,8 +1,10 @@
-import { type BotContext, commands, buttons } from "../commands";
-import {
-    ButtonInteraction,
-  type CacheType,
+import { type BotContext, buttons, commands } from "../commands";
+import type {
+  ButtonInteraction,
   ChatInputCommandInteraction,
+} from "discord.js";
+import {
+  type CacheType,
   type Interaction,
   type InteractionReplyOptions,
   MessageFlags,
@@ -21,11 +23,13 @@ export default async function interactionCreate(
 
   if (interaction.isButton()) {
     routeButtonInteraction(interaction, ctx);
-    return;
   }
 }
 
-export async function replyWithError(interaction: Interaction<CacheType>, error: string): Promise<void> {
+export async function replyWithError(
+  interaction: Interaction<CacheType>,
+  error: string,
+): Promise<void> {
   const emoji = getEmoji("catsurprised", interaction.client);
   const codeBlockContent = codeBlock(error);
 
@@ -36,7 +40,7 @@ export async function replyWithError(interaction: Interaction<CacheType>, error:
   };
 
   // If other types of interactions are added to interactionCreate()
-  // then error handling will also need to be extended
+  // Then error handling will also need to be extended
   if (interaction.isChatInputCommand() || interaction.isButton()) {
     // Reply() throws if already replied/deferred, followUp() works in both cases.
     await (interaction.replied || interaction.deferred
@@ -72,7 +76,10 @@ export async function routeChatInputCommand(
       "Command execution failed",
     );
 
-    replyWithError(interaction, error instanceof Error ? error.message : String(error));
+    replyWithError(
+      interaction,
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
 
@@ -80,21 +87,20 @@ async function routeButtonInteraction(
   interaction: ButtonInteraction<CacheType>,
   ctx: BotContext,
 ) {
-
   const button = buttons.get(interaction.customId);
   if (!button) {
     return;
   }
   const log = ctx.logger.child({ button: interaction.customId });
 
-  // need to create button registry
+  // Need to create button registry
   try {
     await button.execute(interaction, ctx);
     log.info({
       btn: button,
       user: interaction.user.id,
     });
-  } catch(error) {
+  } catch (error) {
     log.error(
       {
         err: error,
@@ -103,6 +109,9 @@ async function routeButtonInteraction(
       "Button execution failed",
     );
 
-    replyWithError(interaction, error instanceof Error ? error.message : String(error));
+    replyWithError(
+      interaction,
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }

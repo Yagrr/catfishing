@@ -1,8 +1,6 @@
+import type { ButtonBuilder, ButtonInteraction } from "discord.js";
 import {
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
   type ChatInputCommandInteraction,
   ContainerBuilder,
   type Guild,
@@ -11,7 +9,7 @@ import {
 } from "discord.js";
 import { type FishingResult, play } from "../../lib/fish";
 import { getGuildOrReply, getTextChannelOrReply } from "./reply";
-import { type UserInfo, getUserInfo} from "./user";
+import { type UserInfo, getUserInfo } from "./user";
 import type { Logger } from "pino";
 import { buildButtonFish } from "../fish";
 import { buildButtonSell } from "../sell";
@@ -34,7 +32,7 @@ export interface CurrentFishingSession {
 }
 
 // RGB
-const FISHING_CONTAINER_COLOR_ACCENT = 153_371_43;
+const FISHING_CONTAINER_COLOR_ACCENT = 15_337_143;
 
 // Backend calls and fish
 export async function handleFishCommand(
@@ -52,7 +50,7 @@ export async function handleFishCommand(
   // TODO: implement ThreadChannel check
   const channel = await getTextChannelOrReply(
     interaction,
-    "You can only fish in a text channel."
+    "You can only fish in a text channel.",
   );
   if (channel === null) {
     return;
